@@ -416,6 +416,62 @@
             `;
         }
 
+        // Rendu de l'écran des règles
+        function renderRules() {
+            const playerCount = gameState.players.length;
+            const config = ROLES_CONFIG[playerCount];
+            const teamSizes = TEAM_SIZES[playerCount];
+            
+            return `
+                <h1>⚔️ The Resistance</h1>
+                <h2>Rappel des Règles</h2>
+                
+                <div class="info-box">
+                    <h3>📊 Composition</h3>
+                    <p><strong>${playerCount} joueurs :</strong></p>
+                    <p style="color: #00ff88;">🛡️ ${config.resistance} Résistants</p>
+                    <p style="color: #ff0080;">🔪 ${config.spies} Espions</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>🎯 Objectif</h3>
+                    <p><strong>Résistance :</strong> Réussir 3 missions</p>
+                    <p><strong>Espions :</strong> Faire échouer 3 missions</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>🎮 Déroulement</h3>
+                    <p>1️⃣ Le <strong>Leader</strong> propose une équipe</p>
+                    <p>2️⃣ Tout le monde <strong>vote</strong> l'équipe (👍/👎)</p>
+                    <p>3️⃣ Si acceptée, l'équipe part en <strong>mission</strong></p>
+                    <p>4️⃣ Chaque membre vote secrètement <strong>SUCCÈS/ÉCHEC</strong></p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>⚠️ Règles importantes</h3>
+                    <p>• Les <span style="color: #00ff88;">Résistants</span> doivent toujours voter <strong>SUCCÈS</strong></p>
+                    <p>• Les <span style="color: #ff0080;">Espions</span> peuvent voter <strong>SUCCÈS ou ÉCHEC</strong></p>
+                    <p>• <strong>1 seul ÉCHEC</strong> suffit pour rater une mission</p>
+                    ${playerCount >= 7 ? '<p>• Mission 4 : <strong>2 ÉCHECS</strong> nécessaires pour échouer</p>' : ''}
+                    <p>• Si <strong>5 équipes rejetées</strong> : les Espions gagnent !</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>👥 Tailles d'équipe par mission</h3>
+                    <div style="display: flex; justify-content: space-around; margin-top: 15px; flex-wrap: wrap;">
+                        ${teamSizes.map((size, i) => `
+                            <div style="text-align: center; padding: 10px; background: rgba(0, 212, 255, 0.2); border-radius: 8px; margin: 5px; min-width: 60px;">
+                                <div style="font-size: 1.5em; font-weight: bold;">${size}</div>
+                                <div style="font-size: 0.8em; color: #888;">Mission ${i + 1}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="startReveal()">C'est parti ! 🚀</button>
+            `;
+        }
+
         // Rendu de l'écran de révélation
         function renderReveal() {
             if (gameState.revealIndex >= gameState.players.length) {
@@ -756,6 +812,9 @@
                 case 'setup':
                     app.innerHTML = renderSetup();
                     break;
+                case 'rules':
+                    app.innerHTML = renderRules();
+                    break;
                 case 'reveal':
                     app.innerHTML = renderReveal();
                     break;
@@ -796,9 +855,15 @@
             
             gameState.players = players;
             gameState.roles = assignRoles(players.length);
+            gameState.currentScreen = 'rules';
+            
+            render();
+        }
+        
+        // Démarrer la révélation des rôles
+        function startReveal() {
             gameState.currentScreen = 'reveal';
             gameState.revealIndex = 0;
-            
             render();
         }
 
