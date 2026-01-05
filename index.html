@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Resistance</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="The Resistance">
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="description" content="The Resistance - Jeu de société en ligne">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⚔️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%230a0e27'/><text x='90' y='130' font-size='100' text-anchor='middle'>⚔️</text></svg>">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="data:application/json,{%22name%22:%22The%20Resistance%22,%22short_name%22:%22Resistance%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0e27%22,%22theme_color%22:%22%2300d4ff%22,%22orientation%22:%22portrait%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%230a0e27'/><text x='256' y='370' font-size='280' text-anchor='middle'>⚔️</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.8);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #0a0e27;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-success:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.8);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff0080, #cc0066);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+        }
+
+        .btn-danger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 0, 128, 0.8);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .player-list {
+            margin: 20px 0;
+        }
+
+        .player-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .player-item.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .player-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .role-reveal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .role-reveal.black {
+            background: #000;
+        }
+
+        .role-reveal.resistance {
+            background: linear-gradient(135deg, #0033cc, #00d4ff);
+        }
+
+        .role-reveal.spy {
+            background: linear-gradient(135deg, #cc0033, #ff0080);
+        }
+
+        .role-reveal h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .role-icon {
+            font-size: 8em;
+            margin: 30px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .mission-board {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .mission-slot {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin: 5px;
+        }
+
+        .mission-slot.success {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            border-color: #00ff88;
+        }
+
+        .mission-slot.fail {
+            background: linear-gradient(135deg, #ff0080, #cc0066);
+            border-color: #ff0080;
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .info-box h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .team-size-info {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        .team-size-info div {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .vote-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .vote-buttons button {
+            flex: 1;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .checkbox-item {
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .game-over h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .game-over.resistance-wins h2 {
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+        }
+
+        .game-over.spies-win h2 {
+            color: #ff0080;
+            text-shadow: 0 0 30px rgba(255, 0, 128, 0.8);
+        }
+
+        .reject-counter {
+            background: rgba(255, 0, 128, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+            border: 2px solid rgba(255, 0, 128, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="container"></div>
+
+    <script>
+        // Configuration du jeu
+        const TEAM_SIZES = {
+            5: [2, 3, 2, 3, 3],
+            6: [2, 3, 4, 3, 4],
+            7: [2, 3, 3, 4, 4],
+            8: [3, 4, 4, 5, 5],
+            9: [3, 4, 4, 5, 5],
+            10: [3, 4, 4, 5, 5]
+        };
+
+        const ROLES_CONFIG = {
+            5: { resistance: 3, spies: 2 },
+            6: { resistance: 4, spies: 2 },
+            7: { resistance: 4, spies: 3 },
+            8: { resistance: 5, spies: 3 },
+            9: { resistance: 6, spies: 3 },
+            10: { resistance: 6, spies: 4 }
+        };
+
+        // État du jeu
+        let gameState = {
+            players: [],
+            roles: [],
+            currentScreen: 'setup',
+            revealIndex: 0,
+            missions: [],
+            currentMission: 0,
+            leaderIndex: 0,
+            selectedTeam: [],
+            missionVotes: [],
+            rejectCount: 0
+        };
+
+        // Fonction pour mélanger un tableau
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Attribuer les rôles
+        function assignRoles(playerCount) {
+            const config = ROLES_CONFIG[playerCount];
+            const roles = [
+                ...Array(config.resistance).fill('resistance'),
+                ...Array(config.spies).fill('spy')
+            ];
+            return shuffle(roles);
+        }
+
+        // Rendu de l'écran de setup
+        function renderSetup() {
+            return `
+                <h1>⚔️ The Resistance</h1>
+                <p class="subtitle">Qui sont les espions parmi nous ?</p>
+                
+                <h2>Configuration</h2>
+                
+                <input type="text" id="player1" placeholder="Joueur 1 *" required>
+                <input type="text" id="player2" placeholder="Joueur 2 *" required>
+                <input type="text" id="player3" placeholder="Joueur 3 *" required>
+                <input type="text" id="player4" placeholder="Joueur 4 *" required>
+                <input type="text" id="player5" placeholder="Joueur 5 *" required>
+                <input type="text" id="player6" placeholder="Joueur 6">
+                <input type="text" id="player7" placeholder="Joueur 7">
+                <input type="text" id="player8" placeholder="Joueur 8">
+                <input type="text" id="player9" placeholder="Joueur 9">
+                <input type="text" id="player10" placeholder="Joueur 10">
+                
+                <button class="btn-primary" onclick="startGame()">Commencer la Partie</button>
+            `;
+        }
+
+        // Rendu de l'écran de révélation
+        function renderReveal() {
+            if (gameState.revealIndex >= gameState.players.length) {
+                gameState.currentScreen = 'game';
+                gameState.currentMission = 0;
+                gameState.missions = [];
+                gameState.leaderIndex = 0;
+                gameState.rejectCount = 0;
+                return renderGame();
+            }
+
+            const player = gameState.players[gameState.revealIndex];
+            
+            return `
+                <div class="role-reveal black">
+                    <h2>Passez le téléphone à</h2>
+                    <h1 style="color: #00d4ff; font-size: 3em; margin: 30px 0;">${player}</h1>
+                    <button class="btn-primary" style="width: 80%; max-width: 400px;" 
+                            onmousedown="showRole()" 
+                            ontouchstart="showRole(); event.preventDefault();">
+                        Appuyez pour voir votre rôle
+                    </button>
+                    <p style="margin-top: 20px; color: #888;">Maintenez le doigt appuyé</p>
+                </div>
+            `;
+        }
+
+        // Montrer le rôle
+        function showRole() {
+            const role = gameState.roles[gameState.revealIndex];
+            const player = gameState.players[gameState.revealIndex];
+            
+            const roleClass = role === 'resistance' ? 'resistance' : 'spy';
+            const roleTitle = role === 'resistance' ? 'RÉSISTANT' : 'ESPION';
+            const roleIcon = role === 'resistance' ? '🛡️' : '🔪';
+            
+            document.getElementById('app').innerHTML = `
+                <div class="role-reveal ${roleClass}">
+                    <h2>${player}</h2>
+                    <div class="role-icon">${roleIcon}</div>
+                    <h1 style="font-size: 3em;">${roleTitle}</h1>
+                    <button class="btn-secondary" style="width: 80%; max-width: 400px; margin-top: 50px;" 
+                            onmouseup="nextReveal()" 
+                            ontouchend="nextReveal(); event.preventDefault();"
+                            onmouseleave="nextReveal()">
+                        Relâchez pour continuer
+                    </button>
+                </div>
+            `;
+        }
+
+        function nextReveal() {
+            gameState.revealIndex++;
+            render();
+        }
+
+        // Rendu de l'écran de jeu principal
+        function renderGame() {
+            const playerCount = gameState.players.length;
+            const teamSizes = TEAM_SIZES[playerCount];
+            const currentTeamSize = teamSizes[gameState.currentMission];
+            const leader = gameState.players[gameState.leaderIndex];
+            
+            const resistanceWins = gameState.missions.filter(m => m === 'success').length;
+            const spyWins = gameState.missions.filter(m => m === 'fail').length;
+            
+            if (resistanceWins >= 3) {
+                return renderGameOver('resistance');
+            }
+            if (spyWins >= 3) {
+                return renderGameOver('spies');
+            }
+            
+            if (gameState.rejectCount >= 5) {
+                gameState.missions.push('fail');
+                gameState.rejectCount = 0;
+                gameState.currentMission++;
+                return renderGame();
+            }
+            
+            return `
+                <h1>⚔️ The Resistance</h1>
+                
+                <div class="mission-board">
+                    ${[0, 1, 2, 3, 4].map(i => `
+                        <div class="mission-slot ${gameState.missions[i] || ''}">
+                            ${gameState.missions[i] === 'success' ? '✓' : ''}
+                            ${gameState.missions[i] === 'fail' ? '✗' : ''}
+                            ${!gameState.missions[i] ? (i + 1) : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="info-box">
+                    <h3>Mission ${gameState.currentMission + 1}</h3>
+                    <p><strong>Leader :</strong> ${leader}</p>
+                    <p><strong>Taille d'équipe :</strong> ${currentTeamSize} joueurs</p>
+                </div>
+                
+                ${gameState.rejectCount > 0 ? `
+                    <div class="reject-counter">
+                        ⚠️ Équipe rejetée ${gameState.rejectCount} fois
+                        ${gameState.rejectCount >= 4 ? '<br><strong>Attention ! La prochaine équipe doit passer ou les espions gagnent !</strong>' : ''}
+                    </div>
+                ` : ''}
+                
+                <h3 style="margin: 20px 0; color: #00d4ff;">Sélectionnez ${currentTeamSize} joueurs</h3>
+                
+                <div class="player-list">
+                    ${gameState.players.map((player, idx) => `
+                        <div class="player-item ${gameState.selectedTeam.includes(idx) ? 'selected' : ''}" 
+                             onclick="togglePlayer(${idx})">
+                            <span class="player-name">${player}</span>
+                            <span>${gameState.selectedTeam.includes(idx) ? '✓' : ''}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <button class="btn-primary" 
+                        onclick="proposeTeam()" 
+                        ${gameState.selectedTeam.length !== currentTeamSize ? 'disabled' : ''}>
+                    Proposer l'Équipe
+                </button>
+            `;
+        }
+
+        function togglePlayer(index) {
+            const playerCount = gameState.players.length;
+            const teamSize = TEAM_SIZES[playerCount][gameState.currentMission];
+            
+            const idx = gameState.selectedTeam.indexOf(index);
+            if (idx > -1) {
+                gameState.selectedTeam.splice(idx, 1);
+            } else {
+                if (gameState.selectedTeam.length < teamSize) {
+                    gameState.selectedTeam.push(index);
+                }
+            }
+            render();
+        }
+
+        function proposeTeam() {
+            gameState.currentScreen = 'vote';
+            render();
+        }
+
+        // Rendu de l'écran de vote
+        function renderVote() {
+            const teamNames = gameState.selectedTeam.map(idx => gameState.players[idx]).join(', ');
+            
+            return `
+                <h1>⚔️ The Resistance</h1>
+                <h2>Vote de l'Équipe</h2>
+                
+                <div class="info-box">
+                    <h3>Équipe Proposée</h3>
+                    <p style="font-size: 1.2em; margin-top: 10px;">${teamNames}</p>
+                </div>
+                
+                <p style="text-align: center; margin: 20px 0; font-size: 1.1em;">
+                    Tous les joueurs votent (en vrai, pouce haut/bas)<br>
+                    Le leader entre le résultat :
+                </p>
+                
+                <div class="vote-buttons">
+                    <button class="btn-success" onclick="teamVote(true)">
+                        👍 ACCEPTÉ
+                    </button>
+                    <button class="btn-danger" onclick="teamVote(false)">
+                        👎 REJETÉ
+                    </button>
+                </div>
+            `;
+        }
+
+        function teamVote(accepted) {
+            if (accepted) {
+                gameState.currentScreen = 'mission';
+                gameState.missionVotes = [];
+                gameState.missionVoteIndex = 0;
+                gameState.rejectCount = 0;
+                render();
+            } else {
+                gameState.rejectCount++;
+                gameState.leaderIndex = (gameState.leaderIndex + 1) % gameState.players.length;
+                gameState.selectedTeam = [];
+                gameState.currentScreen = 'game';
+                render();
+            }
+        }
+
+        // Rendu de l'écran de mission (pass-and-play)
+        function renderMission() {
+            if (gameState.missionVoteIndex >= gameState.selectedTeam.length) {
+                gameState.currentScreen = 'missionResult';
+                return renderMissionResult();
+            }
+            
+            const playerIdx = gameState.selectedTeam[gameState.missionVoteIndex];
+            const player = gameState.players[playerIdx];
+            
+            return `
+                <div class="role-reveal black">
+                    <h2>Passez le téléphone à</h2>
+                    <h1 style="color: #00ff88; font-size: 3em; margin: 30px 0;">${player}</h1>
+                    <button class="btn-primary" style="width: 80%; max-width: 400px;" 
+                            onclick="showMissionVote()">
+                        Cliquez pour voter
+                    </button>
+                </div>
+            `;
+        }
+
+        function showMissionVote() {
+            const playerIdx = gameState.selectedTeam[gameState.missionVoteIndex];
+            const player = gameState.players[playerIdx];
+            
+            document.getElementById('app').innerHTML = `
+                <div class="container">
+                    <h2>${player}</h2>
+                    <h3 style="text-align: center; margin: 30px 0; color: #00d4ff;">
+                        Votez secrètement pour cette mission
+                    </h3>
+                    
+                    <div class="vote-buttons">
+                        <button class="btn-success" onclick="missionVote('success')">
+                            ✓ SUCCÈS
+                        </button>
+                        <button class="btn-danger" onclick="missionVote('fail')">
+                            ✗ ÉCHEC
+                        </button>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 30px; color: #888; font-size: 0.9em;">
+                        Les Résistants doivent voter SUCCÈS<br>
+                        Les Espions peuvent voter SUCCÈS ou ÉCHEC
+                    </p>
+                </div>
+            `;
+        }
+
+        function missionVote(vote) {
+            gameState.missionVotes.push(vote);
+            gameState.missionVoteIndex++;
+            render();
+        }
+
+        // Rendu du résultat de la mission
+        function renderMissionResult() {
+            const shuffledVotes = shuffle(gameState.missionVotes);
+            const failCount = shuffledVotes.filter(v => v === 'fail').length;
+            
+            const playerCount = gameState.players.length;
+            const missionNumber = gameState.currentMission + 1;
+            
+            // Mission 4 avec 7+ joueurs nécessite 2 échecs
+            const failsNeeded = (playerCount >= 7 && missionNumber === 4) ? 2 : 1;
+            
+            const missionSuccess = failCount < failsNeeded;
+            gameState.missions.push(missionSuccess ? 'success' : 'fail');
+            
+            return `
+                <h1>⚔️ The Resistance</h1>
+                <h2>Résultat de la Mission ${missionNumber}</h2>
+                
+                <div class="result-card" style="background: ${missionSuccess ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 0, 128, 0.2)'}; border: 2px solid ${missionSuccess ? '#00ff88' : '#ff0080'};">
+                    <div style="font-size: 4em; margin: 20px 0;">
+                        ${missionSuccess ? '✓' : '✗'}
+                    </div>
+                    <h3 style="color: ${missionSuccess ? '#00ff88' : '#ff0080'};">
+                        ${missionSuccess ? 'SUCCÈS' : 'ÉCHEC'}
+                    </h3>
+                </div>
+                
+                <div class="info-box">
+                    <h3>Votes</h3>
+                    ${shuffledVotes.map(vote => `
+                        <div style="padding: 10px; margin: 5px 0; background: ${vote === 'success' ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 0, 128, 0.2)'}; border-radius: 8px;">
+                            ${vote === 'success' ? '✓ SUCCÈS' : '✗ ÉCHEC'}
+                        </div>
+                    `).join('')}
+                    ${playerCount >= 7 && missionNumber === 4 ? '<p style="margin-top: 10px; color: #00d4ff;">⚠️ Cette mission nécessitait 2 échecs pour échouer</p>' : ''}
+                </div>
+                
+                <button class="btn-primary" onclick="nextMission()">
+                    Mission Suivante
+                </button>
+            `;
+        }
+
+        function nextMission() {
+            gameState.currentMission++;
+            gameState.leaderIndex = (gameState.leaderIndex + 1) % gameState.players.length;
+            gameState.selectedTeam = [];
+            gameState.currentScreen = 'game';
+            render();
+        }
+
+        // Rendu de la fin de partie
+        function renderGameOver(winner) {
+            const isResistance = winner === 'resistance';
+            
+            return `
+                <div class="game-over ${isResistance ? 'resistance-wins' : 'spies-win'}">
+                    <h2>${isResistance ? '🛡️ LA RÉSISTANCE GAGNE !' : '🔪 LES ESPIONS GAGNENT !'}</h2>
+                    
+                    <div class="mission-board" style="margin: 40px 0;">
+                        ${[0, 1, 2, 3, 4].map(i => `
+                            <div class="mission-slot ${gameState.missions[i] || ''}">
+                                ${gameState.missions[i] === 'success' ? '✓' : ''}
+                                ${gameState.missions[i] === 'fail' ? '✗' : ''}
+                                ${!gameState.missions[i] ? (i + 1) : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>Révélation des Rôles</h3>
+                        ${gameState.players.map((player, idx) => `
+                            <div style="padding: 15px; margin: 10px 0; background: ${gameState.roles[idx] === 'resistance' ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 0, 128, 0.2)'}; border-radius: 8px; border: 2px solid ${gameState.roles[idx] === 'resistance' ? '#00ff88' : '#ff0080'};">
+                                <strong>${player}</strong> : ${gameState.roles[idx] === 'resistance' ? '🛡️ Résistant' : '🔪 Espion'}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button class="btn-primary" onclick="location.reload()">
+                        Nouvelle Partie
+                    </button>
+                </div>
+            `;
+        }
+
+        // Fonction principale de rendu
+        function render() {
+            const app = document.getElementById('app');
+            
+            switch(gameState.currentScreen) {
+                case 'setup':
+                    app.innerHTML = renderSetup();
+                    break;
+                case 'reveal':
+                    app.innerHTML = renderReveal();
+                    break;
+                case 'game':
+                    app.innerHTML = renderGame();
+                    break;
+                case 'vote':
+                    app.innerHTML = renderVote();
+                    break;
+                case 'mission':
+                    app.innerHTML = renderMission();
+                    break;
+                case 'missionResult':
+                    app.innerHTML = renderMissionResult();
+                    break;
+            }
+        }
+
+        // Démarrer le jeu
+        function startGame() {
+            const players = [];
+            for (let i = 1; i <= 10; i++) {
+                const input = document.getElementById(`player${i}`);
+                if (input && input.value.trim()) {
+                    players.push(input.value.trim());
+                }
+            }
+            
+            if (players.length < 5) {
+                alert('Il faut au moins 5 joueurs !');
+                return;
+            }
+            
+            if (players.length > 10) {
+                alert('Maximum 10 joueurs !');
+                return;
+            }
+            
+            gameState.players = players;
+            gameState.roles = assignRoles(players.length);
+            gameState.currentScreen = 'reveal';
+            gameState.revealIndex = 0;
+            
+            render();
+        }
+
+        // Initialisation
+        render();
+    </script>
+</body>
+</html>
